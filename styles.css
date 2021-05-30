@@ -1,0 +1,89 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	padding: 1rem;
+	padding-bottom: 0.5rem;
+}
+
+input {
+	padding: 1rem;
+	color: black;
+	font-size: 1rem;
+}
+
+/* #4CAF50 Green; #008CBA Blue; #555555 Black; #f44336 Red; #e7e7e7 Gray */
+button {
+	background-color: #008cba;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+img {
+	cursor: pointer;
+	height: 68vh;
+	width: auto;
+	display: block;
+	margin: auto;
+	padding: 0.5rem;
+}
+
+img:active {
+	transform: scale(0.95);
+}
+
+.container-top {
+	display: flex;
+}
+
+.container-top > button {
+	flex-grow: 1;
+}
+
+#load-key {
+	background: #e7e7e7;
+	color: black;
+}
+
+#load-key:active {
+	background: #a5a5a5;
+}
+
+#save-key {
+	background: #555555;
+}
+
+#save-key:active {
+	background: #333333;
+}
+
+.container-bottom {
+	display: flex;
+}
+
+.container-bottom > input {
+	flex-grow: 3;
+}
+
+.container-bottom > button {
+	flex-grow: 1;
+}
+
+#get-wallpaper:active {
+	background: #004e68;
+}
