@@ -4,7 +4,7 @@
 	"description": "A minimal Electron application",
 	"main": "main.js",
 	"scripts": {
-		"start": "electron ."
+		"start": "electron --trace-warnings ./src/browser/main.js"
 	},
 	"repository": "https://github.com/electron/electron-quick-start",
 	"keywords": [
@@ -21,6 +21,7 @@
 		"electron-reloader": "^1.2.1"
 	},
 	"dependencies": {
+		"axios": "^0.21.1",
 		"wallpaper": "^5.0.0"
 	}
 }

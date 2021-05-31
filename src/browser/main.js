@@ -1,36 +1,28 @@
-// Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
-const { ipcMain } = require('electron/main')
+const axios = require('axios')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const fs = require('fs')
 const path = require('path')
+const wallpaper = require('wallpaper')
 
-// hot-reload, buggy as shit (might heavily influence functionality of code)
-// try {
-// 	require('electron-reloader')(module)
-// } catch (_) {}
+let mainWindow
 
 function createWindow() {
-	// Create the browser window.
-	const mainWindow = new BrowserWindow({
+	mainWindow = new BrowserWindow({
 		width: 800,
 		height: 800,
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js'),
-			nodeIntegration: true,
-			contextIsolation: false,
+			nodeIntegration: false, // this should be false
+			contextIsolation: true, // this should be true
+			enableRemoteModule: false, // might need to turn this to true, but should be false
 		},
 	})
 
-	// and load the index.html of the app.
-	mainWindow.loadFile('index.html')
+	mainWindow.loadFile(path.join(__dirname, '../renderer/index.html')) // wrong?
 
-	// Open the DevTools.
 	process.env.NODE_ENV !== 'production' && mainWindow.webContents.openDevTools()
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
 	createWindow()
 
@@ -41,36 +33,67 @@ app.whenReady().then(() => {
 	})
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
 	if (process.platform !== 'darwin') app.quit()
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+// main process code:
 
-ipcMain.on('userinput', (event, args) => {
-	const [msg, Key] = args
-	console.log(`KEY: ${Key}`)
-	switch (msg) {
+function readAPIKey() {
+	const rawdata = fs.readFileSync(path.join(__dirname, 'config.json'))
+	const { key: API_KEY } = JSON.parse(rawdata)
+	return API_KEY
+}
+
+ipcMain.on('toMain', async (event, args) => {
+	const [command, ...arguments] = args
+	// let API_KEY = readAPIKey() // dev
+	let rawdata
+
+	switch (command) {
 		case 'load-key':
-			const rawdata = fs.readFileSync('config.json')
-			const { key: LoadedKey } = JSON.parse(rawdata)
-			console.log(`msg: ${msg}, key: ${LoadedKey}`)
+			rawdata = fs.readFileSync(path.join(__dirname, 'config.json'))
+			const key_data = JSON.parse(rawdata)
+			mainWindow.webContents.send('fromMain', key_data)
 			break
+
 		case 'save-key':
-			if (!Key) return
-			console.log(`msg: ${msg}, key: ${Key}`)
-			fs.writeFileSync('config.json', JSON.stringify({ key: `${Key}` }))
+			const [KEY] = arguments
+			fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify({ key: `${KEY}` }))
 			break
+
 		case 'get-wallpaper':
-			console.log(msg)
+			const [query] = arguments
+			rawdata = fs.readFileSync(path.join(__dirname, 'config.json'))
+			const { key: API_KEY } = JSON.parse(rawdata)
+			API_ENDPOINT = 'https://api.pexels.com/v1/search'
+
+			const response = await axios.get(`${API_ENDPOINT}?query=${query}`, {
+				headers: {
+					Authorization: `${API_KEY}`,
+				},
+			})
+			const { data } = response
+			const { photos } = data
+
+			mainWindow.webContents.send('fromMain', photos)
 			break
+
+		case 'set-wallpaper':
+			const [base64Image] = arguments
+			let picturePath = path.join(__dirname, 'recent.jpeg')
+			picturePath = path.normalize(picturePath)
+
+			fs.writeFile(picturePath, base64Image, 'base64', async (err) => {
+				if (err) console.error(err)
+				await wallpaper.set(picturePath, { scale: 'stretch' }).then(() => {
+					console.log(path.resolve(picturePath))
+				})
+			})
+			break
+
 		default:
+			console.log("command didn't match any case")
 			break
 	}
 })
-
-// Key: 563492ad6f91700001000001f6fab3378c474797aeb1f944160d1630
