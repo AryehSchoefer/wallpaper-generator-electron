@@ -39,6 +39,7 @@ app.on('window-all-closed', function () {
 
 // main process code:
 
+// dev
 function readAPIKey() {
 	const rawdata = fs.readFileSync(path.join(__dirname, 'config.json'))
 	const { key: API_KEY } = JSON.parse(rawdata)
@@ -68,7 +69,7 @@ ipcMain.on('toMain', async (event, args) => {
 			const { key: API_KEY } = JSON.parse(rawdata)
 			API_ENDPOINT = 'https://api.pexels.com/v1/search'
 
-			const response = await axios.get(`${API_ENDPOINT}?query=${query}`, {
+			const response = await axios.get(`${API_ENDPOINT}?query=${query}&per_page=80`, {
 				headers: {
 					Authorization: `${API_KEY}`,
 				},
@@ -76,7 +77,7 @@ ipcMain.on('toMain', async (event, args) => {
 			const { data } = response
 			const { photos } = data
 
-			mainWindow.webContents.send('fromMain', photos)
+			mainWindow.webContents.send('fromMain', photos, API_KEY)
 			break
 
 		case 'set-wallpaper':

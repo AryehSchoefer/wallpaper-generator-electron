@@ -4,6 +4,13 @@
 	box-sizing: border-box;
 }
 
+h3 {
+	font-family: sans-serif;
+	padding-bottom: 0.75rem;
+	text-align: left;
+	font-size: 1rem;
+}
+
 body {
 	display: flex;
 	flex-direction: column;
@@ -35,7 +42,6 @@ button:hover {
 }
 
 img {
-	cursor: pointer;
 	height: 68vh;
 	width: auto;
 	display: block;
@@ -45,6 +51,16 @@ img {
 
 img:active {
 	transform: scale(0.95);
+}
+
+#wallpaper {
+	cursor: pointer;
+}
+
+#loading {
+	display: none;
+	height: 68vh;
+	width: auto;
 }
 
 .container-top {
