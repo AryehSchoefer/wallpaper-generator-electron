@@ -22,6 +22,6 @@
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
-		"wallpaper": "^5.0.0"
+		"wallpaper": "^6.0.0"
 	}
 }
