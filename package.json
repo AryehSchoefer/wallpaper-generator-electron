@@ -21,7 +21,7 @@
 		"electron-reloader": "^1.2.1"
 	},
 	"dependencies": {
-		"axios": "^0.21.1",
+		"axios": "^0.27.1",
 		"wallpaper": "^5.0.0"
 	}
 }
